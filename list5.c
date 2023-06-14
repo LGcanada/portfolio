@@ -1,4 +1,4 @@
-/* 6. Length,Search,Court and Replace Operations  for Linked Lists
+/* 7. Deleting a mathing node  from a Linked Lists (in the middle of the list)
 * File name: list3.c
 * Date June 2023
 * Author: Luis Gamboa 
@@ -23,6 +23,11 @@ bool is_member (Node *node, int find_value);
 int count_matches (Node*node, int find_value);
 void replace_matches (Node *node, int find_value,
                         int replace_value);
+Node *delete_first_match(Node *head, int delete_value,
+                                bool *was_deleted);
+Node *delete_all_matches(Node *head, int delete_value,
+                         int *num_deleted);
+
 
 int main()
 {
@@ -31,22 +36,33 @@ int main()
     list1_head = insert_at_head(list1_head, 7);
     list1_head = insert_at_head(list1_head, 5);
     list1_head = insert_at_head(list1_head, 3);
-
-   
-     printf("List before replacement\n");
-     print_list(list1_head);
+    list1_head = insert_at_head(list1_head, 5);
+    list1_head = insert_at_head(list1_head, 5);
+    list1_head = insert_at_head(list1_head, 3);
     
-    replace_matches(list1_head, 5, 9); // replaces the value 5 for 9
-     printf("List after replacement\n");
-     print_list(list1_head);   
+    printf("List before any deletions...\n");
+    print_list(list1_head);
+    bool deleted;
+    list1_head =delete_first_match(list1_head, 3, &deleted);
+    if (deleted)
+        printf("A node with value 3 was deleted!\n");
+    else
+        printf("A node with value 3 was not deleted!\n");
+    printf("List after any deletions...\n");
+    print_list(list1_head);     
+    list1_head =delete_first_match(list1_head, 8, &deleted);
+    if (deleted)
+        printf("A node with value 3 was deleted!\n");
+    else
+        printf("A node with value 3 was not deleted!\n");
 
 }
 
 /* 
-*Function Name:count_matches
+*Function Name:replace_matches
 * Description:  replaces matching values in a linked list with another value
-*Parameters-Arg: Node *node, int find_value
-* Returns: boolean
+*Parameters-Arg: Node *node, int find_value, int replace_value
+* Returns: Nothing
 */
 
 void replace_matches (Node *node, int find_value,
@@ -62,6 +78,77 @@ void replace_matches (Node *node, int find_value,
     }
 
 }
+/* 
+*Function Name:delete_all_matches
+* Description:  Deleting a middle node 
+*Parameters-Arg: Node *node, int find_value
+* Returns: temp, NULL,head
+*/
+Node *delete_all_matches(Node *head, int delete_value,
+                         int *num_deleted)
+{
+    Node *current = head;
+    bool deleted = false;
+    *num_deleted = 0;
+
+    do 
+    {
+        current = delete_first_match(current, delete_value, 
+                                 &deleted);
+        if (deleted) *num_deleted = *num_deleted + 1;
+    } while (deleted);
+
+    return current;
+}
+/* 
+*Function Name:delete_first_match
+* Description:  Deleting a middle node 
+*Parameters-Arg: Node *node, int find_value
+* Returns: temp, NULL,head
+*/
+Node *delete_first_match(Node *head, int delete_value,
+                                bool *was_deleted)
+{
+    if (head ==NULL) // if the list is empty, return false
+    {
+        *was_deleted = false;
+        return NULL;
+    }
+
+    if (head->value == delete_value)
+    {
+        Node * temp = head->next;
+        free(head);
+        *was_deleted = true;
+        return temp;
+    }
+
+    Node *current = head-> next; // for the node after the head
+    Node *prev = head;
+
+    while (current != NULL) // traversing the list
+    {
+        if (current->value == delete_value)
+        {
+            prev->next = current->next;
+            free(current);
+            *was_deleted = true;
+            return head;
+
+        }    
+
+        prev = current;
+        current = current->next;
+    }
+        *was_deleted = false;
+        return head;
+
+
+}
+
+
+
+
 
 
 /* 
@@ -156,10 +243,6 @@ Node *delete_at_tail(Node *head)
 
 
     }
-
-
-
-
 
 }
 /* 
